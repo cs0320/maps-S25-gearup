@@ -26,6 +26,12 @@ export interface LatLong {
 // };
 // const initialZoom = ...
 
+const ProvidenceLatLong: LatLong = {
+  lat: 41.824,
+  long: -71.4128,
+};
+const initialZoom = 10;
+
 
 function onMapClick(e: MapLayerMouseEvent) {
   console.log(e.lngLat.lat);
@@ -34,7 +40,9 @@ function onMapClick(e: MapLayerMouseEvent) {
 
 export default function Mapbox() {
   const [viewState, setViewState] = useState({
-
+    latitude: ProvidenceLatLong.lat,
+    longitude: ProvidenceLatLong.long,
+    zoom: initialZoom,
     // ...
   });
 
@@ -42,29 +50,44 @@ export default function Mapbox() {
   // - add the overlay useState
   // - implement the useEffect to fetch the overlay data
 
+  const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    setOverlay(overlayData());
+  }, []);
+
 
   return (
     <div className="map">
       <Map
         mapboxAccessToken={MAPBOX_API_KEY}
         {...viewState}
-      // TODO: MAPS PART 2:
-      // - add the primary props to the Map (style, mapStyle, onMove).
+        // TODO: MAPS PART 2:
+        // - add the primary props to the Map (style, mapStyle, onMove).
 
-      // style=...
-      // mapStyle=...
-      // onMove=...
+        // style=...
+        // mapStyle=...
+        // onMove=...
 
-      // TODO: MAPS PART 3:
-      // - add the onClick handler
+        // TODO: MAPS PART 3:
+        // - add the onClick handler
 
-      // onClick=...
+        // onClick=...
+        style={{ width: window.innerWidth, height: window.innerHeight }}
+        mapStyle={"mapbox://styles/mapbox/streets-v12"}
+        onMove={(ev: ViewStateChangeEvent) => setViewState(ev.viewState)}
+        onClick={(ev: MapLayerMouseEvent) => onMapClick(ev)}
       >
         {/* TODO: MAPS PART 6:
             - add the Source and Layer components to the Map that take in data "overlay"
             TODO: MAPS PART 7:
             - add the geoLayer to the Layer component
         */}
+        <Source id="geo_data" type="geojson" data={overlay}>
+          <Layer {...geoLayer} />
+        </Source>
       </Map>
     </div>
   );
